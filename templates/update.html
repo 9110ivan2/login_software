@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change password</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
+</head>
+<body>
+    <h1>Change password</h1>
+    <form action="/change-password" method="post">
+        <label for="login_id">Username</label>
+        <input type="text" name="login_id" id="login_id" required>
+        <br>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" required>
+        <br>
+        <label for="new_password">New password</label>
+        <input type="password" name="new_password" id="new_password" required>
+        <br>
+        <button type="submit">Change password</button>
+    </form>
+    
+</body>
+</html>

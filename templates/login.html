@@ -1,0 +1,11 @@
+{% block content %}
+<h1>Log in</h1>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
+<form action="/login" method="post">
+    <label for="login_id">Username:</label>
+    <input type="text" id="login_id" name="login_id"><br><br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password"><br><br>
+    <button class="submit">Submit</button>
+</form>
+{% endblock %}
