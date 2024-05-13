@@ -8,8 +8,11 @@
 </head>
 <body>
     <h1> {{ username }} you are loged in!</h1>  
-    <form action="{{ url_for('register')}}" method="post">
+    <form action="/logout" method="post">
         <button type="submit">Logout</button>
+    </form> 
+    <form action="/change-password" method="post">
+        <button type="submit">Change password</button>
     </form>  
 </body>
 </html>

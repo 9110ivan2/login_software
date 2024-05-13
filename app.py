@@ -34,15 +34,29 @@ def index():
 @app.route("/register", methods=["POST", "GET"])
 def register():
     if request.method == "POST":
-        username = request.form.get("login_id", "")
-        password = request.form.get("password", "")
-        with conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "INSERT INTO login_table (login_id, password) VALUES(%s, %s)",
-                    (username, password)
-                )
-        return redirect("success")
+        username = request.form.get("username","")
+        password = request.form.get("password","")
+        if username and password:
+            try:
+                with conn:
+                    with conn.cursor() as cur:
+                        cur.execute(
+                            "INSERT INTO login_table (username, password) VALUES(%s, %s)",
+                            (username, password)
+                        )
+            except psycopg2.errors.UniqueViolation:
+                error_message = "Error! Try another username."
+                return render_template("error.html", error_message=error_message)
+            except psycopg2.errors.NotNullViolation:
+                error_message = "Error! Add username or password."
+                return render_template("error.html", error_message=error_message)
+            except psycopg2.errors.CheckViolation:
+                error_message = "Error! Password needs to be at least 8 symbols."
+                return render_template("error.html", error_message=error_message)
+            return redirect("success")
+        else:
+            error_message = "Error! Username or password cannot be empty"
+            return render_template("error.html", error_message=error_message)
     return render_template("index.html")
 
 @app.route("/success")
@@ -52,12 +66,12 @@ def success():
 @app.route("/login/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form.get("login_id", "")
+        username = request.form.get("username", "")
         password = request.form.get("password", "")
         with conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT * FROM login_table WHERE login_id = %s AND password= %s ",
+                    "SELECT * FROM login_table WHERE username = %s AND password= %s ",
                     (username, password)
                 )
                 account = cur.fetchone()
@@ -75,8 +89,7 @@ def login_success():
     return render_template("success_login.html")
 
 
-@app.route("/login/", methods=["POST"])
-@login_required
+@app.route("/logout", methods= ["POST"])
 def logout():
     logout_user()
     return redirect(url_for("login"))
@@ -85,22 +98,26 @@ def logout():
 @app.route("/change-password", methods=["GET", "POST"])
 def change_password():
     if request.method == "POST":
-        username = request.form.get("login_id", "")
+        username = request.form.get("username", "")
         password = request.form.get("password", "")
         with conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT * FROM login_table WHERE login_id = %s AND password = %s",
+                    "SELECT * FROM login_table WHERE username = %s AND password = %s",
                     (username, password)
                 )
                 account = cur.fetchone()
-                if account:
-                    new_password = request.form.get("new_password", "")
-                    cur.execute(
-                    "UPDATE login_table SET password = %s WHERE login_id = %s AND password = %s",
-                    (new_password, username, password)
-                    )
-                    return render_template("update_success.html", username=username)
+                try:
+                    if account:
+                        new_password = request.form.get("new_password", "")
+                        cur.execute(
+                        "UPDATE login_table SET password = %s WHERE username = %s AND password = %s",
+                        (new_password, username, password)
+                        )
+                        return render_template("update_success.html", username=username)
+                except psycopg2.errors.CheckViolation:
+                    error_message = "Error! Password needs to be at least 8 symbols."
+                    return render_template("incorrect_update.html", error_message=error_message)
     return render_template("update.html")
     
         
